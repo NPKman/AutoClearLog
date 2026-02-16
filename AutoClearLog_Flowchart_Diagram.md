@@ -187,7 +187,7 @@ stateDiagram-v2
     CheckLogFile --> ValidateFormat: Is .log
     CheckLogFile --> SkipLog: Not .log
     
-    SkipLog --> CheckMoreLogs
+    SkipLog --> CheckMoreLogsA
     ValidateFormat --> CheckDateFormat
     
     CheckDateFormat --> ValidDate: Parse OK
@@ -201,9 +201,9 @@ stateDiagram-v2
     CompressFile --> DeleteFile
     DeleteFile --> LogAction
     
-    LogAction --> CheckMoreLogs{More files?}
-    CheckMoreLogs --> ProcessLogFiles: Yes
-    CheckMoreLogs --> CheckMoreFolders: No
+    LogAction --> CheckMoreLogsA: More files?
+    CheckMoreLogsA --> ProcessLogFiles: Yes
+    CheckMoreLogsA --> CheckMoreFolders: No
     
     CheckMoreFolders --> ProcessFolders: Yes
     CheckMoreFolders --> WriteSummary: No
@@ -308,28 +308,28 @@ graph LR
 
 ```mermaid
 graph TD
-    A["🎯 Start Validation"] --> B["✓ path.txt exists?"]
+    A["🎯 Start Validation"] --> B{path.txt<br/>exists?}
     B -->|NO| B1["❌ Create path.txt first"]
     B1 --> END1["⚠️ STOP"]
     
-    B -->|YES| C["✓ Folder paths valid?"]
+    B -->|YES| C{Folder paths<br/>valid?}
     C -->|NO| C1["❌ Check folder paths"]
     C1 --> END2["⚠️ STOP"]
     
-    C -->|YES| D["✓ .log files found?"]
-    D -->|NO| D1["⚠️ No .log files (normal)"]
+    C -->|YES| D{.log files<br/>found?}
+    D -->|NO| D1["⚠️ No .log files"]
     D1 --> END3["✅ OK"]
     
-    D -->|YES| E["✓ Filename format correct?"]
-    E -->|NO| E1["❌ Rename files to EVMSWSS-YYYY-MM-DD.log"]
+    D -->|YES| E{Filename format<br/>correct?}
+    E -->|NO| E1["❌ Rename to EVMSWSS-YYYY-MM-DD.log"]
     E1 --> END4["⚠️ STOP"]
     
-    E -->|YES| F["✓ daysThreshold set?"]
-    F -->|NO| F1["❌ Set daysThreshold in Program.cs"]
+    E -->|YES| F{daysThreshold<br/>set?}
+    F -->|NO| F1["❌ Set in Program.cs"]
     F1 --> END5["⚠️ STOP"]
     
     F -->|YES| G["✓ All checks passed!"]
-    G --> H["🚀 Ready to run AutoClearLog.exe"]
+    G --> H["🚀 Ready to run"]
     H --> END6["✅ START"]
 ```
 
@@ -339,14 +339,14 @@ graph TD
 
 ```mermaid
 flowchart TD
-    Error["⚠️ Exception Caught"] --> ErrorType{Error Type?}
+    Error["⚠️ Exception Caught"] --> ErrorType{Error<br/>Type?}
     
-    ErrorType -->|File Not Found| E1["❌ path.txt not found<br/>Create file first"]
-    ErrorType -->|Invalid Path| E2["❌ Folder path invalid<br/>Check path.txt"]
-    ErrorType -->|No Permission| E3["❌ Access denied<br/>Check permissions"]
-    ErrorType -->|Parse Error| E4["❌ Invalid filename format<br/>Rename files"]
-    ErrorType -->|ZIP Error| E5["❌ Cannot create ZIP<br/>Check disk space"]
-    ErrorType -->|Delete Error| E6["❌ Cannot delete file<br/>File in use"]
+    ErrorType -->|File Not Found| E1["❌ path.txt not found"]
+    ErrorType -->|Invalid Path| E2["❌ Folder path invalid"]
+    ErrorType -->|No Permission| E3["❌ Access denied"]
+    ErrorType -->|Parse Error| E4["❌ Invalid filename format"]
+    ErrorType -->|ZIP Error| E5["❌ Cannot create ZIP"]
+    ErrorType -->|Delete Error| E6["❌ Cannot delete file"]
     
     E1 --> LogError["📝 Write to log"]
     E2 --> LogError
